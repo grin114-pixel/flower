@@ -126,7 +126,7 @@
 
 .card-image-wrap {
   position: relative;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
   background: var(--green-pale);
 }
 
@@ -178,7 +178,7 @@
 }
 
 .icon-btn.delete {
-  color: #b42318;
+  color: rgba(0, 0, 0, 0.7);
 }
 
 .card-multi-badge {
@@ -396,13 +396,13 @@
 }
 
 .confirm-modal-message {
-  padding: 0 14px 12px;
+  padding: 10px 14px 18px;
   color: rgba(0, 0, 0, 0.66);
   font-weight: 700;
 }
 
 .confirm-modal-actions {
-  padding: 0 14px 12px;
+  padding: 0 14px 18px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
