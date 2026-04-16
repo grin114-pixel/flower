@@ -1,0 +1,40 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* keep var names compatible with recipe_baby styles */
+  --green: #FFB7C5;         /* main (벚꽃색) */
+  --green-light: #FFD1DC;
+  --green-pale: #FFF5F7;
+  --green-dark: #FF8FB2;
+  --text: #2D2D2D;
+  --text-muted: #777;
+  --bg: #FFF7F9;
+  --card-bg: #FFFFFF;
+  --border: rgba(255, 183, 197, 0.28);
+  --shadow: 0 2px 14px rgba(255, 143, 178, 0.16);
+  --shadow-md: 0 10px 26px rgba(255, 143, 178, 0.22);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+input, textarea { font-family: inherit; }
