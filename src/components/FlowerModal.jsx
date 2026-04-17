@@ -96,25 +96,22 @@ export default function FlowerModal({ onClose, onSave, initialData }) {
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
-          <div className="image-upload-area" onClick={() => fileRef.current.click()}>
-            {imageUrls[0] ? (
-              <img src={imageUrls[0]} alt="대표 사진" className="image-preview" />
-            ) : (
-              <div className="image-placeholder">
-                <Camera size={36} className="placeholder-icon" />
-                <span>사진 여러 장 첨부</span>
-              </div>
-            )}
-            {uploading && (
-              <div className="upload-overlay">
-                <Loader2 size={28} className="spin" />
-                <span>
-                  압축 업로드 중...{' '}
-                  {uploadProgress ? `(${uploadProgress.index + 1}/${uploadProgress.total})` : ''}
-                </span>
-              </div>
-            )}
-          </div>
+          <button
+            type="button"
+            className="attach-btn"
+            onClick={() => fileRef.current.click()}
+            disabled={uploading}
+            aria-label="이미지 첨부"
+            title="이미지 첨부"
+          >
+            {uploading ? <Loader2 size={16} className="spin" aria-hidden /> : <Camera size={16} aria-hidden />}
+            <span>이미지 첨부</span>
+            {uploadProgress ? (
+              <span className="attach-progress">
+                ({uploadProgress.index + 1}/{uploadProgress.total})
+              </span>
+            ) : null}
+          </button>
 
           <input
             ref={fileRef}
@@ -138,8 +135,7 @@ export default function FlowerModal({ onClose, onSave, initialData }) {
                       title="대표로 설정"
                       aria-label="대표로 설정"
                     >
-                      <Star size={14} />
-                      {idx === 0 ? '대표' : ''}
+                      <Star size={14} fill={idx === 0 ? 'currentColor' : 'none'} />
                     </button>
                     <button
                       type="button"

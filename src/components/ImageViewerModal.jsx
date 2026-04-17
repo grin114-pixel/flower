@@ -51,7 +51,13 @@ export default function ImageViewerModal({ urls, initialIndex = 0, onClose }) {
           <div className="viewer-count">
             {index + 1} / {list.length}
           </div>
-          <button type="button" className="icon-btn" onClick={onClose} aria-label="닫기">
+          <button
+            type="button"
+            className="viewer-close-btn"
+            onClick={onClose}
+            aria-label="닫기"
+            title="닫기"
+          >
             <X size={22} />
           </button>
         </div>

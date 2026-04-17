@@ -64,7 +64,26 @@ export default function App() {
           <div className="header-inner">
             <div className="header-left">
               <FlowerLogo />
-              <h1 className="app-title">꽃사전</h1>
+              <h1
+                className="app-title app-title-link"
+                onClick={() => {
+                  setSearchQuery('')
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setSearchQuery('')
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
+                  }
+                }}
+                title="메인으로"
+                aria-label="메인으로 이동"
+              >
+                꽃사전
+              </h1>
             </div>
 
             <div className="header-center">

@@ -63,7 +63,7 @@ export default function FlowerCard({ flower, onEdit, onRequestDelete, onViewImag
             title="수정"
             aria-label="수정"
           >
-            <Pencil size={16} />
+            <Pencil size={14} />
           </button>
           <button
             type="button"
@@ -72,7 +72,7 @@ export default function FlowerCard({ flower, onEdit, onRequestDelete, onViewImag
             title="삭제"
             aria-label="삭제"
           >
-            <Trash2 size={16} />
+            <Trash2 size={14} />
           </button>
         </div>
 
