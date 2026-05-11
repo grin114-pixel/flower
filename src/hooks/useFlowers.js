@@ -2,18 +2,28 @@ import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { deleteImages } from '../lib/imageUtils'
 
-export function useFlowers() {
+export function useFlowers(userId) {
   const [flowers, setFlowers] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const fetchFlowers = useCallback(async ({ showLoading = true } = {}) => {
-    if (showLoading) setLoading(true)
-    const { data, error } = await supabase.from('flowers').select('*').order('created_at', {
-      ascending: false,
-    })
-    if (!error) setFlowers(data || [])
-    setLoading(false)
-  }, [])
+  const fetchFlowers = useCallback(
+    async ({ showLoading = true } = {}) => {
+      if (!userId) {
+        setFlowers([])
+        setLoading(false)
+        return
+      }
+      if (showLoading) setLoading(true)
+      const { data, error } = await supabase
+        .from('flowers')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+      if (!error) setFlowers(data || [])
+      setLoading(false)
+    },
+    [userId],
+  )
 
   useEffect(() => {
     ;(async () => {
@@ -23,7 +33,8 @@ export function useFlowers() {
   }, [fetchFlowers])
 
   const addFlower = async (flower) => {
-    const { data, error } = await supabase.from('flowers').insert([flower]).select()
+    const payload = userId ? { ...flower, user_id: userId } : flower
+    const { data, error } = await supabase.from('flowers').insert([payload]).select()
     if (!error && data) setFlowers((prev) => [data[0], ...prev])
     return { data, error }
   }
@@ -65,4 +76,3 @@ export function useFlowers() {
     refetch: fetchFlowers,
   }
 }
-

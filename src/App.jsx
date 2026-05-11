@@ -1,10 +1,12 @@
-import { useState } from 'react'
-import { Plus, Search, Shuffle } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Plus, Search, Shuffle, Lock } from 'lucide-react'
+import { supabase } from './lib/supabase'
 import { useFlowers } from './hooks/useFlowers'
 import FlowerCard from './components/FlowerCard'
 import FlowerModal from './components/FlowerModal'
 import ImageViewerModal from './components/ImageViewerModal'
 import ConfirmModal from './components/ConfirmModal'
+import LoginPage from './components/LoginPage'
 import headerFlowerIcon from './assets/header-flower-hotpink.png'
 import './App.css'
 
@@ -15,13 +17,59 @@ function FlowerLogo() {
 }
 
 export default function App() {
+  const [session, setSession] = useState(undefined) // undefined = checking, null = no session
+  const [recoveryMode, setRecoveryMode] = useState(false)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session ?? null)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, sess) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setRecoveryMode(true)
+        setSession(sess ?? null)
+      } else {
+        setSession(sess ?? null)
+        if (event === 'SIGNED_OUT') {
+          setRecoveryMode(false)
+        }
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  if (session === undefined) {
+    return (
+      <div className="auth-shell">
+        <div className="auth-checking">
+          <div className="spinner" />
+        </div>
+      </div>
+    )
+  }
+
+  if (!session || recoveryMode) {
+    return (
+      <LoginPage
+        recoveryMode={recoveryMode}
+        onPasswordReset={() => setRecoveryMode(false)}
+      />
+    )
+  }
+
+  return <MainApp session={session} />
+}
+
+function MainApp({ session }) {
   const { flowers, loading, addFlower, updateFlower, deleteFlower, shuffleFlowers, refetch } =
-    useFlowers()
+    useFlowers(session?.user?.id)
   const [showFlowerModal, setShowFlowerModal] = useState(false)
   const [editFlower, setEditFlower] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [deleteTarget, setDeleteTarget] = useState(null)
-  const [viewer, setViewer] = useState(null) // { urls: string[], index: number }
+  const [viewer, setViewer] = useState(null)
 
   const q = searchQuery.trim().toLowerCase()
   const filtered =
@@ -31,7 +79,7 @@ export default function App() {
     if (editFlower) {
       await updateFlower(editFlower.id, data)
     } else {
-      await addFlower(data)
+      await addFlower({ ...data, user_id: session?.user?.id })
     }
     setEditFlower(null)
   }
@@ -55,6 +103,10 @@ export default function App() {
     await deleteFlower(deleteTarget.id)
     await refetch()
     setDeleteTarget(null)
+  }
+
+  const handleLock = async () => {
+    await supabase.auth.signOut()
   }
 
   return (
@@ -114,6 +166,15 @@ export default function App() {
                   <span>랜덤</span>
                 </button>
               )}
+              <button
+                type="button"
+                className="header-lock-btn"
+                onClick={handleLock}
+                title="로그아웃"
+                aria-label="로그아웃"
+              >
+                <Lock size={16} aria-hidden />
+              </button>
             </div>
           </div>
         </header>
@@ -185,4 +246,3 @@ export default function App() {
     </>
   )
 }
-
