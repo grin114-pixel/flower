@@ -31,7 +31,7 @@ function useFitCardTitle(name) {
   return { titleRef, rowRef }
 }
 
-export default function FlowerCard({ flower, onEdit, onRequestDelete, onViewImages }) {
+export default function FlowerCard({ flower, onEdit, onRequestDelete, onViewImages, readOnly = false }) {
   const { titleRef, rowRef } = useFitCardTitle(flower.name)
   const urls = Array.isArray(flower.image_urls) ? flower.image_urls : []
   const cover = urls[0] || ''
@@ -55,26 +55,28 @@ export default function FlowerCard({ flower, onEdit, onRequestDelete, onViewImag
           </div>
         )}
 
-        <div className="card-top-actions">
-          <button
-            type="button"
-            className="icon-btn edit card-top-btn"
-            onClick={() => onEdit(flower)}
-            title="수정"
-            aria-label="수정"
-          >
-            <Pencil size={14} />
-          </button>
-          <button
-            type="button"
-            className="icon-btn delete card-top-btn"
-            onClick={() => onRequestDelete(flower)}
-            title="삭제"
-            aria-label="삭제"
-          >
-            <Trash2 size={14} />
-          </button>
-        </div>
+        {!readOnly && (
+          <div className="card-top-actions">
+            <button
+              type="button"
+              className="icon-btn edit card-top-btn"
+              onClick={() => onEdit(flower)}
+              title="수정"
+              aria-label="수정"
+            >
+              <Pencil size={14} />
+            </button>
+            <button
+              type="button"
+              className="icon-btn delete card-top-btn"
+              onClick={() => onRequestDelete(flower)}
+              title="삭제"
+              aria-label="삭제"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        )}
 
         {urls.length > 1 ? (
           <div className="card-multi-badge" title="사진 여러 장" aria-label="사진 여러 장">

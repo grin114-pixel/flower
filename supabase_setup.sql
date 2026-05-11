@@ -46,3 +46,24 @@ create policy "flowers_update_own" on public.flowers
 -- 자신의 꽃만 삭제
 create policy "flowers_delete_own" on public.flowers
   for delete using (auth.uid() = user_id);
+
+-- =============================================
+-- /sample 페이지: 누구나 grin114@naver.com 데이터 조회 가능
+-- =============================================
+-- SECURITY DEFINER 함수 (anon은 auth.users 직접 접근 불가하므로 우회)
+create or replace function public.sample_user_id()
+returns uuid
+language sql
+security definer
+set search_path = public, auth
+as $$
+  select id from auth.users where email = 'grin114@naver.com' limit 1
+$$;
+
+grant execute on function public.sample_user_id() to anon, authenticated;
+
+drop policy if exists "flowers_select_sample" on public.flowers;
+create policy "flowers_select_sample" on public.flowers
+  for select
+  to anon
+  using (user_id = public.sample_user_id());

@@ -7,8 +7,19 @@ import FlowerModal from './components/FlowerModal'
 import ImageViewerModal from './components/ImageViewerModal'
 import ConfirmModal from './components/ConfirmModal'
 import LoginPage from './components/LoginPage'
+import SamplePage from './components/SamplePage'
 import headerFlowerIcon from './assets/header-flower-hotpink.png'
 import './App.css'
+
+function usePathname() {
+  const [pathname, setPathname] = useState(() => window.location.pathname)
+  useEffect(() => {
+    const onPop = () => setPathname(window.location.pathname)
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+  return pathname
+}
 
 function FlowerLogo() {
   return (
@@ -16,14 +27,36 @@ function FlowerLogo() {
   )
 }
 
+const REMEMBER_KEY = 'flower.remember-device'
+const SESSION_ONLY_KEY = 'flower.session-only'
+
 export default function App() {
+  const pathname = usePathname()
+  if (pathname === '/sample' || pathname.startsWith('/sample/')) {
+    return <SamplePage />
+  }
+  return <AuthGate />
+}
+
+function AuthGate() {
   const [session, setSession] = useState(undefined) // undefined = checking, null = no session
   const [recoveryMode, setRecoveryMode] = useState(false)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session ?? null)
-    })
+    ;(async () => {
+      const { data } = await supabase.auth.getSession()
+      const sess = data.session
+      if (sess) {
+        const remember = window.localStorage.getItem(REMEMBER_KEY) === 'true'
+        const sessionOnly = window.sessionStorage.getItem(SESSION_ONLY_KEY) === 'true'
+        if (!remember && !sessionOnly) {
+          await supabase.auth.signOut()
+          setSession(null)
+          return
+        }
+      }
+      setSession(sess ?? null)
+    })()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, sess) => {
       if (event === 'PASSWORD_RECOVERY') {
@@ -33,6 +66,8 @@ export default function App() {
         setSession(sess ?? null)
         if (event === 'SIGNED_OUT') {
           setRecoveryMode(false)
+          window.localStorage.removeItem(REMEMBER_KEY)
+          window.sessionStorage.removeItem(SESSION_ONLY_KEY)
         }
       }
     })

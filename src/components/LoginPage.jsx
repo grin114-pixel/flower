@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
-import headerFlowerIcon from '../assets/header-flower-hotpink.png'
+import headerFlowerIcon from '../assets/header-flower-hotpink-transparent.png'
 import './LoginPage.css'
 
 const PIN_SUFFIX = 'flower'
+const REMEMBER_KEY = 'flower.remember-device'
 
 function toAuthPassword(pin) {
   return pin + PIN_SUFFIX
@@ -21,6 +22,9 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
   const [loginPin, setLoginPin] = useState('')
   const [loginError, setLoginError] = useState('')
   const [loginLoading, setLoginLoading] = useState(false)
+  const [rememberDevice, setRememberDevice] = useState(() => {
+    return typeof window !== 'undefined' && window.localStorage.getItem(REMEMBER_KEY) === 'true'
+  })
 
   // Signup
   const [signupEmail, setSignupEmail] = useState('')
@@ -62,7 +66,16 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
       password: toAuthPassword(loginPin),
     })
     setLoginLoading(false)
-    if (error) setLoginError('이메일 또는 비밀번호가 올바르지 않아요.')
+    if (error) {
+      setLoginError('이메일 또는 비밀번호가 올바르지 않아요.')
+      return
+    }
+    if (rememberDevice) {
+      window.localStorage.setItem(REMEMBER_KEY, 'true')
+    } else {
+      window.localStorage.removeItem(REMEMBER_KEY)
+      window.sessionStorage.setItem('flower.session-only', 'true')
+    }
   }
 
   async function handleSignup(e) {
@@ -167,8 +180,8 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
 
   const brand = (
     <div className="auth-brand">
-      <img src={headerFlowerIcon} className="auth-logo" alt="꽃사전" />
-      <span className="auth-brand-name">꽃사전</span>
+      <img src={headerFlowerIcon} className="auth-logo" alt="나의 꽃사전" />
+      <span className="auth-brand-name">나의 꽃사전</span>
     </div>
   )
 
@@ -409,6 +422,14 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
               onChange={(e) => setLoginPin(onlyDigits(e.target.value))}
               autoComplete="current-password"
             />
+          </label>
+          <label className="auth-remember">
+            <input
+              type="checkbox"
+              checked={rememberDevice}
+              onChange={(e) => setRememberDevice(e.target.checked)}
+            />
+            <span>이 기기 기억하기</span>
           </label>
           {loginError && <p className="auth-error">{loginError}</p>}
           <button type="submit" className="auth-btn-primary" disabled={loginLoading}>
