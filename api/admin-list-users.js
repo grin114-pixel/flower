@@ -21,9 +21,9 @@ export default async function handler(req, res) {
   }
   const callerToken = authHeader.slice(7)
 
-  const supabaseUrl = process.env.VITE_SUPABASE_URL
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  const adminEmail = process.env.ADMIN_EMAIL
+  const supabaseUrl = (process.env.VITE_SUPABASE_URL ?? '').trim()
+  const serviceRoleKey = (process.env.SUPABASE_SERVICE_ROLE_KEY ?? '').trim()
+  const adminEmail = (process.env.ADMIN_EMAIL ?? '').trim().toLowerCase()
 
   if (!supabaseUrl || !serviceRoleKey || !adminEmail) {
     console.error('admin-list-users: 서버 환경 변수가 설정되지 않았습니다.')
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
   if (userError || !user) {
     return res.status(401).json({ error: '유효하지 않은 토큰입니다.' })
   }
-  if (user.email !== adminEmail) {
+  if ((user.email ?? '').toLowerCase() !== adminEmail) {
     return res.status(403).json({ error: '관리자 권한이 없습니다.' })
   }
 

@@ -16,10 +16,10 @@ function formatDate(iso) {
 }
 
 export default function AdminPage({ session, onBack }) {
-  const adminEmail = import.meta.env.VITE_ADMIN_EMAIL
+  const adminEmail = (import.meta.env.VITE_ADMIN_EMAIL ?? '').trim().toLowerCase()
 
   // 클라이언트 측 관리자 가드
-  if (session?.user?.email !== adminEmail) {
+  if ((session?.user?.email ?? '').toLowerCase() !== adminEmail || !adminEmail) {
     return (
       <div className="adm-shell">
         <div className="adm-forbidden">
