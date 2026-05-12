@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { ArrowLeft, Search, Lock, Check, RefreshCw, Mail, LogOut } from 'lucide-react'
+import { ArrowLeft, Search, Lock, Check, RefreshCw, LogOut } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import flowerIcon from '../assets/flower-icon-pink.png'
 import './AdminPage.css'
@@ -113,30 +113,20 @@ function AdminLogin({ adminEmail, onBack }) {
         <form className="adm-login-form" onSubmit={handleSubmit}>
           <label className="adm-field">
             <span>관리자 이메일</span>
-            <div className="adm-input-wrap">
-              <span className="adm-input-icon">
-                <Mail size={15} strokeWidth={1.6} aria-hidden />
-              </span>
-              <input type="email" readOnly value={adminEmail} className="adm-input-readonly" />
-            </div>
+            <input type="email" readOnly value={adminEmail} className="adm-input-readonly" />
           </label>
           <label className="adm-field">
             <span>비밀번호 (숫자 4자리)</span>
-            <div className="adm-input-wrap">
-              <span className="adm-input-icon">
-                <Lock size={15} strokeWidth={1.6} aria-hidden />
-              </span>
-              <input
-                type="password"
-                inputMode="numeric"
-                maxLength={4}
-                placeholder="0000"
-                value={pin}
-                onChange={(e) => setPin(onlyDigits(e.target.value))}
-                autoComplete="current-password"
-                className="adm-login-pin"
-              />
-            </div>
+            <input
+              type="password"
+              inputMode="numeric"
+              maxLength={4}
+              placeholder="0000"
+              value={pin}
+              onChange={(e) => setPin(onlyDigits(e.target.value))}
+              autoComplete="current-password"
+              className="adm-login-pin"
+            />
           </label>
 
           <label className="adm-login-remember">
@@ -151,7 +141,6 @@ function AdminLogin({ adminEmail, onBack }) {
           {error ? <p className="adm-field-error">{error}</p> : null}
 
           <button type="submit" className="adm-btn-primary" disabled={loading}>
-            <img src={flowerIcon} className="adm-btn-icon" alt="" aria-hidden />
             {loading ? '로그인 중...' : '로그인'}
           </button>
         </form>

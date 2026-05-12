@@ -26,9 +26,28 @@ export default function SamplePage() {
     ;(async () => {
       setLoading(true)
       setError('')
+
+      const envId = (import.meta.env.VITE_SAMPLE_USER_ID ?? '').trim()
+      let ownerId = envId || null
+      if (!ownerId) {
+        const { data: rpcId, error: rpcErr } = await supabase.rpc('sample_user_id')
+        if (cancelled) return
+        if (rpcErr || !rpcId) {
+          setError(
+            '샘플 계정(grin114@naver.com) 연결이 필요해요. Supabase에 sample_user_id() 함수와 ' +
+              'flowers_select_sample 정책(authenticated 포함)을 적용하거나, .env에 VITE_SAMPLE_USER_ID를 넣어주세요.'
+          )
+          setFlowers([])
+          setLoading(false)
+          return
+        }
+        ownerId = rpcId
+      }
+
       const { data, error: fetchErr } = await supabase
         .from('flowers')
         .select('*')
+        .eq('user_id', ownerId)
         .order('created_at', { ascending: false })
       if (cancelled) return
       if (fetchErr) {

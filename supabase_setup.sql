@@ -65,5 +65,5 @@ grant execute on function public.sample_user_id() to anon, authenticated;
 drop policy if exists "flowers_select_sample" on public.flowers;
 create policy "flowers_select_sample" on public.flowers
   for select
-  to anon
+  to anon, authenticated
   using (user_id = public.sample_user_id());
