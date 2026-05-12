@@ -1,5 +1,5 @@
 import { useState, useId } from 'react'
-import { Mail, Lock, UserPlus, Search } from 'lucide-react'
+import { Mail, Lock, UserPlus } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import flowerIcon from '../assets/flower-icon-pink.png'
 import flowerFooterBlossom from '../assets/flower-footer-blossom.png'
@@ -351,7 +351,7 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
             <PinField label="비밀번호 확인" value={signupPin2} onChange={setSignupPin2} />
             {signupError && <p className="auth-error">{signupError}</p>}
             <button type="submit" className="auth-btn-primary" disabled={signupLoading}>
-              <img src={flowerIcon} className="auth-btn-icon" alt="" aria-hidden />
+              <LoginSubmitFlower />
               {signupLoading ? '가입 중...' : '가입하기'}
             </button>
           </form>
@@ -465,15 +465,6 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
           >
             <UserPlus size={13} strokeWidth={1.6} />
             회원 가입하기
-          </button>
-          <span className="auth-link-sep" aria-hidden />
-          <button
-            type="button"
-            className="auth-link"
-            onClick={() => { setView('forgot'); setForgotError(''); setForgotDone(false) }}
-          >
-            <Search size={13} strokeWidth={1.6} />
-            비밀번호 찾기
           </button>
           <span className="auth-link-sep" aria-hidden />
           <button

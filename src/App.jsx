@@ -10,6 +10,7 @@ import LoginPage from './components/LoginPage'
 import SamplePage from './components/SamplePage'
 import AdminPage from './components/AdminPage'
 import headerFlowerIcon from './assets/flower-header-line.png'
+import butterflyImg from './assets/flower-butterfly.png'
 import './App.css'
 
 function usePathname() {
@@ -258,7 +259,7 @@ function MainApp({ session }) {
             </div>
           ) : flowers.length === 0 ? (
             <div className="empty-state">
-              <span className="empty-icon">🌸</span>
+              <img src={butterflyImg} className="empty-butterfly" alt="" aria-hidden draggable={false} />
               <p>꽃을 등록해보세요!</p>
             </div>
           ) : filtered.length === 0 ? (
@@ -287,7 +288,7 @@ function MainApp({ session }) {
           title="꽃 등록"
           aria-label="꽃 등록"
         >
-          <Plus size={28} aria-hidden />
+          <Plus size={25} aria-hidden />
         </button>
 
         {showFlowerModal && (

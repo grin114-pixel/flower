@@ -327,10 +327,10 @@
   position: fixed;
   right: 16px;
   bottom: calc(16px + env(safe-area-inset-bottom));
-  width: 56px;
-  height: 56px;
-  border-radius: 22px;
-  background: linear-gradient(135deg, var(--green-dark), var(--green));
+  width: 50px;
+  height: 50px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #FFADC4, #FFCBD8);
   color: white;
   box-shadow: var(--shadow-md);
   display: grid;
@@ -397,6 +397,15 @@
 
 .empty-icon {
   font-size: 34px;
+}
+
+.empty-butterfly {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+  opacity: 0.88;
 }
 
 .spinner {
