@@ -39,10 +39,20 @@ export default function App() {
   if (pathname === '/sample' || pathname.startsWith('/sample/')) {
     return <SamplePage />
   }
-  return <AuthGate pathname={pathname} />
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    return (
+      <AdminPage
+        onBack={() => {
+          window.history.pushState({}, '', '/')
+          window.dispatchEvent(new PopStateEvent('popstate'))
+        }}
+      />
+    )
+  }
+  return <AuthGate />
 }
 
-function AuthGate({ pathname }) {
+function AuthGate() {
   const [session, setSession] = useState(undefined) // undefined = checking, null = no session
   const [recoveryMode, setRecoveryMode] = useState(false)
   /** 비밀번호 재설정 링크로 온 세션은 '기억하기'가 없어도 로그아웃하면 안 됨 */
@@ -117,18 +127,6 @@ function AuthGate({ pathname }) {
         key={recoveryMode ? 'password-recovery' : 'auth'}
         recoveryMode={recoveryMode}
         onPasswordReset={() => setRecoveryMode(false)}
-      />
-    )
-  }
-
-  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
-    return (
-      <AdminPage
-        session={session}
-        onBack={() => {
-          window.history.pushState({}, '', '/')
-          window.dispatchEvent(new PopStateEvent('popstate'))
-        }}
       />
     )
   }

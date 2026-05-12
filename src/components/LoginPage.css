@@ -380,6 +380,10 @@
   font-size: clamp(7.5px, 2.95cqi, 11.5px);
 }
 
+.auth-card .auth-bottom-links--spread .auth-link {
+  font-size: clamp(8.25px, 3.25cqi, 12.65px);
+}
+
 .auth-link:hover,
 .auth-link:focus-visible {
   color: #E97A9A;

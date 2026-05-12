@@ -8,6 +8,132 @@
   font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
 }
 
+.adm-shell--center {
+  justify-content: center;
+  align-items: center;
+  padding: 24px 16px;
+}
+
+.adm-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* ── 관리자 로그인 ( /admin 전용 ) ───────────────── */
+.adm-login-card {
+  width: min(400px, 100%);
+  box-sizing: border-box;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 28px 22px 24px;
+  box-shadow:
+    0 2px 6px rgba(220, 175, 195, 0.1),
+    0 8px 24px rgba(230, 190, 205, 0.12);
+}
+
+.adm-login-title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #3A2030;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+.adm-login-sub {
+  margin: 0 0 22px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #8a7580;
+  text-align: center;
+}
+
+.adm-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.adm-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.adm-input-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #c08090;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.adm-input-wrap input {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px 0 36px;
+  border: 1.5px solid rgba(255, 142, 156, 0.38);
+  border-radius: 10px;
+  background: #fff8f9;
+  font-size: 15px;
+  color: #3a2030;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.adm-input-wrap input:focus {
+  border-color: rgba(255, 100, 130, 0.55);
+  background: #ffffff;
+}
+
+.adm-login-pin {
+  letter-spacing: 4px;
+}
+
+.adm-login-pin::placeholder {
+  letter-spacing: 2px;
+  color: #c0a0a8;
+}
+
+.adm-login-remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #6a4050;
+  cursor: pointer;
+  user-select: none;
+}
+
+.adm-login-remember input {
+  width: 16px;
+  height: 16px;
+  accent-color: #ff8e9c;
+  cursor: pointer;
+}
+
+.adm-login-remember-label {
+  font-weight: 500;
+}
+
+.adm-login-back {
+  width: 100%;
+  margin-top: 16px;
+  justify-content: center;
+}
+
+.adm-login-error-msg {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #d04060;
+  text-align: center;
+}
+
 /* ── 헤더 ────────────────────────────────────────── */
 .adm-header {
   position: sticky;
@@ -363,27 +489,4 @@
   line-height: 1.7;
   margin: 0;
   word-break: break-all;
-}
-
-/* ── 권한 없음 ───────────────────────────────────── */
-.adm-forbidden {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  padding: 48px 16px;
-  text-align: center;
-}
-
-.adm-forbidden-icon {
-  color: #D05070;
-  opacity: 0.7;
-}
-
-.adm-forbidden p {
-  font-size: 15px;
-  color: #6A4050;
-  margin: 0;
 }

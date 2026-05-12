@@ -416,7 +416,7 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
               <PinField label="새 비밀번호" value={changeNewPin} onChange={setChangeNewPin} />
               {changeError && <p className="auth-error">{changeError}</p>}
               <button type="submit" className="auth-btn-primary" disabled={changeLoading}>
-                <img src={flowerIcon} className="auth-btn-icon" alt="" aria-hidden />
+                <LoginSubmitFlower />
                 {changeLoading ? '변경 중...' : '비밀번호 변경하기'}
               </button>
             </form>
