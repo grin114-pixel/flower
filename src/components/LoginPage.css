@@ -1,159 +1,429 @@
+/* ── Shell ──────────────────────────────────────── */
 .auth-shell {
   min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
   display: grid;
   place-items: center;
-  background: linear-gradient(160deg, var(--green-pale) 0%, #fff7f9 55%, var(--green-light) 100%);
-  padding: 16px;
+  background: #FFF5F6;
+  padding: clamp(16px, 4vw, 32px) clamp(12px, 3vw, 16px);
 }
 
+/* ── Card ───────────────────────────────────────── */
 .auth-card {
-  width: min(380px, 100%);
-  background: white;
-  border-radius: 24px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-md);
-  padding: 32px 24px 24px;
+  width: min(460px, 100%);
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  container-name: login-card;
+  container-type: inline-size;
+  background: #FFFFFF;
+  border-radius: 22px;
+  border: none;
+  box-shadow:
+    0 2px 6px rgba(220, 175, 195, 0.09),
+    0 10px 28px rgba(230, 190, 205, 0.14);
+  padding: clamp(28px, 6vw, 44px) clamp(16px, 5vw, 40px) clamp(28px, 5vw, 36px);
   display: grid;
-  gap: 18px;
+  gap: 24px;
 }
 
+/* 로그인만: 카드 상단 패딩 +10% (나의 꽃사전·꽃 로고 윗 여백) */
+.auth-card:has(> .auth-brand + .auth-form) {
+  padding-top: calc(clamp(28px, 6vw, 44px) * 1.1);
+}
+
+/* ── Brand (로고 | 제목+태그라인 2행) ─────────────── */
 .auth-brand {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 14px;
+  row-gap: 5px;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 18px;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  margin-inline: auto;
+}
+
+/* 로그인만: 브랜드 다음이 폼일 때 헤더↔이메일 간격 +10% (카드 gap 24px 기준) */
+.auth-brand:has(+ .auth-form) {
+  margin-bottom: calc(24px * 0.1);
 }
 
 .auth-logo {
-  width: 38px;
-  height: 38px;
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
-  background: transparent;
-  border: none;
+  align-self: center;
 }
 
 .auth-brand-name {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--green-dark);
-  letter-spacing: -0.3px;
+  grid-column: 2;
+  grid-row: 1;
+  font-family: 'Gowun Dodum', 'Noto Sans KR', serif;
+  font-size: clamp(22px, 5.5vw, 28px);
+  font-weight: 700;
+  color: #FF8E9C;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  text-align: left;
+  align-self: end;
+  min-width: 0;
 }
 
+.auth-tagline {
+  grid-column: 2;
+  grid-row: 2;
+  font-family: 'Gowun Dodum', 'Noto Sans KR', serif;
+  font-size: calc(13px * 0.9);
+  color: #A0979C;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.45;
+  text-align: left;
+  margin: 0;
+  padding: 0;
+  max-width: 16.5em;
+  align-self: start;
+  min-width: 0;
+}
+
+@media (max-width: 340px) {
+  .auth-brand {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    justify-items: center;
+    row-gap: 8px;
+    width: 100%;
+  }
+
+  .auth-logo {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .auth-brand-name {
+    grid-column: 1;
+    grid-row: 2;
+    text-align: center;
+    align-self: center;
+  }
+
+  .auth-tagline {
+    grid-column: 1;
+    grid-row: 3;
+    text-align: center;
+    max-width: 100%;
+  }
+}
+
+/* ── Subtitle (sub-pages) ───────────────────────── */
 .auth-subtitle {
   font-size: 14px;
-  font-weight: 700;
-  color: rgba(0, 0, 0, 0.45);
+  font-weight: 600;
+  color: #9E8D94;
   text-align: center;
   margin-top: -6px;
 }
 
+/* ── Form ───────────────────────────────────────── */
 .auth-form {
   display: grid;
-  gap: 28px;
+  gap: 20px;
+  min-width: 0;
+  max-width: 100%;
 }
 
+/* 로그인: 이메일 ↔ 비밀번호 간격만 폼 기본 gap의 2배 */
+.auth-form-email-pin {
+  display: grid;
+  gap: calc(40px * 0.9 * 0.9);
+  min-width: 0;
+}
+
+/* ── Field ──────────────────────────────────────── */
 .auth-field {
   display: grid;
-  gap: 6px;
+  gap: 8px;
 }
 
-.auth-field span {
+.auth-field > span {
   font-size: 12px;
-  font-weight: 700;
-  color: rgba(0, 0, 0, 0.55);
+  font-weight: 500;
+  color: #9E8D94;
+  letter-spacing: 0.01em;
+}
+
+.auth-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #FF8E9C;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .auth-field input {
-  border: 1px solid rgba(255, 183, 197, 0.4);
-  background: rgba(255, 247, 249, 0.8);
-  border-radius: 12px;
-  padding: 11px 12px;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid rgba(255, 142, 156, 0.5);
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 11.5px 16px 11.5px 42px;
+  font-size: 14px;
+  color: #4B4548;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.auth-field input::placeholder {
+  color: #B6A7AE;
 }
 
 .auth-field input:focus {
-  border-color: rgba(255, 143, 178, 0.7);
-  box-shadow: 0 0 0 4px rgba(255, 183, 197, 0.2);
+  border-color: #ff8e9c;
+  box-shadow: 0 0 0 4px rgba(255, 142, 156, 0.2);
 }
 
+/* ── Custom checkbox ────────────────────────────── */
 .auth-remember {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.6);
+  gap: calc(9px * 0.9);
   cursor: pointer;
   user-select: none;
-  margin-top: -2px;
+  padding: calc(2px * 0.9) 0;
 }
 
 .auth-remember input[type='checkbox'] {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--green-dark);
-  cursor: pointer;
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
 }
 
+.auth-checkbox-custom {
+  flex-shrink: 0;
+  width: calc(18px * 0.9);
+  height: calc(18px * 0.9);
+  border: 1px solid rgba(255, 142, 156, 0.5);
+  border-radius: calc(5px * 0.9);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.auth-remember input[type='checkbox']:checked ~ .auth-checkbox-custom {
+  background: #ff8e9c;
+  border-color: #ff8e9c;
+}
+
+.auth-checkbox-custom::after {
+  content: '';
+  display: none;
+  width: calc(4.5px * 0.9);
+  height: calc(8.5px * 0.9);
+  border: calc(2px * 0.9) solid white;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translate(-0.45px, -0.9px);
+}
+
+.auth-remember input[type='checkbox']:checked ~ .auth-checkbox-custom::after {
+  display: block;
+}
+
+.auth-remember-label {
+  font-size: calc(13px * 0.9);
+  font-weight: 500;
+  color: #9E8D94;
+}
+
+/* ── Error ──────────────────────────────────────── */
 .auth-error {
-  font-size: 13px;
-  color: #e53935;
-  font-weight: 600;
+  font-size: 12.5px;
+  color: #E07070;
+  font-weight: 500;
   text-align: center;
 }
 
+/* ── Primary button ─────────────────────────────── */
 .auth-btn-primary {
   width: 100%;
-  padding: 13px;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: calc(14px * 0.85 * 0.9) 16px;
   border-radius: 14px;
-  background: linear-gradient(135deg, var(--green-dark), var(--green));
-  color: white;
-  font-weight: 800;
-  font-size: 15px;
-  margin-top: 2px;
-  transition: opacity 0.15s;
+  background: linear-gradient(180deg, #ffadb5 0%, #ff8e9c 100%);
+  color: #FFFFFF;
+  font-family: 'Gowun Dodum', 'Noto Sans KR', serif;
+  font-weight: 400;
+  font-size: calc(15px * 0.9);
+  line-height: 1.22;
+  letter-spacing: 0.01em;
+  box-shadow: 0 10px 26px rgba(255, 142, 156, 0.28);
+  transition: filter 0.18s, transform 0.1s;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.auth-btn-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.95;
+  flex-shrink: 0;
+}
+
+.auth-btn-login-flower-svg {
+  width: calc(24px * 0.9);
+  height: calc(24px * 0.9);
+  flex-shrink: 0;
+  display: block;
+  overflow: visible;
+}
+
+.auth-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.auth-btn-primary:active:not(:disabled) {
+  transform: scale(0.99);
 }
 
 .auth-btn-primary:disabled {
-  opacity: 0.65;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
+/* ── Done state ─────────────────────────────────── */
 .auth-done {
   display: grid;
-  gap: 8px;
+  gap: 10px;
   text-align: center;
-  color: rgba(0, 0, 0, 0.66);
+  color: #A0979C;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
+/* ── Bottom links ───────────────────────────────── */
 .auth-bottom-links {
   display: flex;
-  justify-content: space-between;
-  gap: 4px;
-  border-top: 1px solid var(--border);
-  padding-top: 14px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: clamp(2px, 1.1cqi, 8px);
+  max-width: 100%;
+  min-width: 0;
+  border-top: 1px solid #e5e5e8;
+  padding-top: 20px;
+  margin-top: -4px;
 }
 
 .auth-bottom-links--center {
   justify-content: center;
 }
 
+.auth-bottom-links--spread .auth-link {
+  flex: 1 1 0;
+}
+
 .auth-link {
-  font-size: 12px;
-  color: rgba(0, 0, 0, 0.42);
-  font-weight: 600;
-  padding: 4px 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(3px, 0.6cqi, 5px);
+  font-size: clamp(8px, 2.45vw, 11.5px);
+  color: #A88E97;
+  font-weight: 500;
+  padding: 4px clamp(2px, 0.8cqi, 6px);
   transition: color 0.15s;
+  white-space: nowrap;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.auth-link svg {
+  width: 1.1em;
+  height: 1.1em;
+  flex-shrink: 0;
+}
+
+.auth-card .auth-bottom-links .auth-link {
+  font-size: clamp(7.5px, 2.95cqi, 11.5px);
 }
 
 .auth-link:hover,
 .auth-link:focus-visible {
-  color: var(--green-dark);
+  color: #E97A9A;
+}
+
+.auth-link--signup-cta {
+  color: #ff8e9c;
+}
+
+.auth-link--signup-cta:hover,
+.auth-link--signup-cta:focus-visible {
+  color: #f06688;
+}
+
+.auth-link-sep {
+  width: 1px;
+  height: 12px;
+  background: #F0D4DC;
+  flex-shrink: 0;
+}
+
+/* ── Footer ─────────────────────────────────────── */
+.auth-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(5px * 0.9);
+  flex-wrap: wrap;
+  text-align: center;
+  font-size: 11.5px;
+  color: #B6A7AE;
+  font-weight: 400;
+  margin-top: -4px;
+  letter-spacing: 0.01em;
+}
+
+.auth-footer-text {
+  line-height: 1.4;
+}
+
+.auth-footer-flower {
+  width: calc(20px * 0.81 * 0.9);
+  height: calc(20px * 0.81 * 0.9);
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
 }

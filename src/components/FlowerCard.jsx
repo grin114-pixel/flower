@@ -1,38 +1,6 @@
-import { useLayoutEffect, useRef } from 'react'
 import { Pencil, Trash2, Images } from 'lucide-react'
 
-const TITLE_FONT_MAX = 14.4
-const TITLE_FONT_MIN = 8
-
-function useFitCardTitle(name) {
-  const titleRef = useRef(null)
-  const rowRef = useRef(null)
-
-  useLayoutEffect(() => {
-    const fit = () => {
-      const el = titleRef.current
-      if (!el) return
-      el.style.fontSize = `${TITLE_FONT_MAX}px`
-      let size = TITLE_FONT_MAX
-      while (size > TITLE_FONT_MIN && el.scrollWidth > el.clientWidth) {
-        size -= 0.25
-        el.style.fontSize = `${size}px`
-      }
-    }
-
-    fit()
-    const row = rowRef.current
-    if (!row || typeof ResizeObserver === 'undefined') return undefined
-    const ro = new ResizeObserver(() => fit())
-    ro.observe(row)
-    return () => ro.disconnect()
-  }, [name])
-
-  return { titleRef, rowRef }
-}
-
 export default function FlowerCard({ flower, onEdit, onRequestDelete, onViewImages, readOnly = false }) {
-  const { titleRef, rowRef } = useFitCardTitle(flower.name)
   const urls = Array.isArray(flower.image_urls) ? flower.image_urls : []
   const cover = urls[0] || ''
 
@@ -87,8 +55,8 @@ export default function FlowerCard({ flower, onEdit, onRequestDelete, onViewImag
       </div>
 
       <div className="card-body">
-        <div className="card-title-row" ref={rowRef}>
-          <h3 className="card-title" ref={titleRef} title={flower.name}>
+        <div className="card-title-row">
+          <h3 className="card-title" title={flower.name}>
             {flower.name}
           </h3>
         </div>

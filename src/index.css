@@ -12,7 +12,7 @@
   --green-dark: #FF8FB2;
   --text: #2D2D2D;
   --text-muted: #777;
-  --bg: #FFF7F9;
+  --bg: #FFFCFD;
   --card-bg: #FFFFFF;
   --border: rgba(255, 183, 197, 0.28);
   --shadow: 0 2px 14px rgba(255, 143, 178, 0.16);
@@ -23,7 +23,7 @@
 
 html, body {
   height: 100%;
-  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg);
   color: var(--text);
   -webkit-tap-highlight-color: transparent;

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Camera, Loader2, Star, Trash2, X } from 'lucide-react'
 import { compressAndUploadMany, deleteImages } from '../lib/imageUtils'
 
+const MAX_IMAGES = 5
+
 function uniq(arr) {
   const out = []
   const seen = new Set()
@@ -17,7 +19,9 @@ function uniq(arr) {
 export default function FlowerModal({ onClose, onSave, initialData }) {
   const isEdit = !!initialData
   const [name, setName] = useState(initialData?.name || '')
-  const [imageUrls, setImageUrls] = useState(() => uniq(initialData?.image_urls || []))
+  const [imageUrls, setImageUrls] = useState(() =>
+    uniq(initialData?.image_urls || []).slice(0, MAX_IMAGES),
+  )
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(null) // { index, total }
@@ -31,8 +35,20 @@ export default function FlowerModal({ onClose, onSave, initialData }) {
   }, [initialData])
 
   const handleFiles = async (fileList) => {
-    const files = Array.from(fileList || []).filter(Boolean)
-    if (!files.length) return
+    const picked = Array.from(fileList || []).filter(Boolean)
+    if (!picked.length) return
+
+    const remaining = MAX_IMAGES - imageUrls.length
+    if (remaining <= 0) {
+      alert('사진은 최대 5장까지 첨부할 수 있어요.')
+      if (fileRef.current) fileRef.current.value = ''
+      return
+    }
+
+    const files = picked.slice(0, remaining)
+    if (picked.length > files.length) {
+      alert(`사진은 최대 ${MAX_IMAGES}장까지 첨부할 수 있어요. 처음 ${remaining}장만 추가됩니다.`)
+    }
 
     setUploading(true)
     setUploadProgress({ index: 0, total: files.length })
@@ -41,7 +57,7 @@ export default function FlowerModal({ onClose, onSave, initialData }) {
         folder: 'flowers',
         onProgress: ({ index, total }) => setUploadProgress({ index, total }),
       })
-      setImageUrls((prev) => uniq([...prev, ...urls]))
+      setImageUrls((prev) => uniq([...prev, ...urls]).slice(0, MAX_IMAGES))
     } catch (err) {
       const msg = err?.message || err?.code || String(err)
       console.error('이미지 업로드 실패:', err)
@@ -77,8 +93,12 @@ export default function FlowerModal({ onClose, onSave, initialData }) {
 
       await onSave({
         name: name.trim(),
-        image_urls: imageUrls.length ? imageUrls : [],
+        image_urls: imageUrls.length ? imageUrls.slice(0, MAX_IMAGES) : [],
       })
+
+      const overCap = initialUrls.slice(MAX_IMAGES)
+      if (isEdit && overCap.length) await deleteImages(overCap)
+
       onClose()
     } finally {
       setSaving(false)
@@ -100,12 +120,12 @@ export default function FlowerModal({ onClose, onSave, initialData }) {
             type="button"
             className="attach-btn"
             onClick={() => fileRef.current.click()}
-            disabled={uploading}
+            disabled={uploading || imageUrls.length >= MAX_IMAGES}
             aria-label="이미지 첨부"
-            title="이미지 첨부"
+            title={imageUrls.length >= MAX_IMAGES ? '사진은 최대 5장까지 첨부할 수 있어요.' : '이미지 첨부'}
           >
             {uploading ? <Loader2 size={16} className="spin" aria-hidden /> : <Camera size={16} aria-hidden />}
-            <span>이미지 첨부</span>
+            <span>이미지 첨부 ({imageUrls.length}/{MAX_IMAGES})</span>
             {uploadProgress ? (
               <span className="attach-progress">
                 ({uploadProgress.index + 1}/{uploadProgress.total})

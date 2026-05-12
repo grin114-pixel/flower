@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Plus, Search, Shuffle, Lock } from 'lucide-react'
 import { supabase } from './lib/supabase'
 import { useFlowers } from './hooks/useFlowers'
@@ -8,7 +8,8 @@ import ImageViewerModal from './components/ImageViewerModal'
 import ConfirmModal from './components/ConfirmModal'
 import LoginPage from './components/LoginPage'
 import SamplePage from './components/SamplePage'
-import headerFlowerIcon from './assets/header-flower-hotpink.png'
+import AdminPage from './components/AdminPage'
+import headerFlowerIcon from './assets/flower-header-line.png'
 import './App.css'
 
 function usePathname() {
@@ -23,7 +24,9 @@ function usePathname() {
 
 function FlowerLogo() {
   return (
-    <img className="app-logo-img" src={headerFlowerIcon} alt="꽃사전" width="22" height="22" />
+    <span className="app-logo-wrap">
+      <img className="app-logo-img" src={headerFlowerIcon} alt="" width="21" height="21" />
+    </span>
   )
 }
 
@@ -35,42 +38,64 @@ export default function App() {
   if (pathname === '/sample' || pathname.startsWith('/sample/')) {
     return <SamplePage />
   }
-  return <AuthGate />
+  return <AuthGate pathname={pathname} />
 }
 
-function AuthGate() {
+function AuthGate({ pathname }) {
   const [session, setSession] = useState(undefined) // undefined = checking, null = no session
   const [recoveryMode, setRecoveryMode] = useState(false)
+  /** 비밀번호 재설정 링크로 온 세션은 '기억하기'가 없어도 로그아웃하면 안 됨 */
+  const passwordRecoveryBypassRef = useRef(false)
 
   useEffect(() => {
-    ;(async () => {
+    const syncRecoveryFromUrl = () => {
+      if (typeof window === 'undefined') return
+      try {
+        const fromHash = new URLSearchParams(window.location.hash.replace(/^#/, '')).get('type')
+        const fromSearch = new URLSearchParams(window.location.search).get('type')
+        if (fromHash === 'recovery' || fromSearch === 'recovery') {
+          passwordRecoveryBypassRef.current = true
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+    syncRecoveryFromUrl()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, sess) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        passwordRecoveryBypassRef.current = true
+        setRecoveryMode(true)
+        setSession(sess ?? null)
+        return
+      }
+      setSession(sess ?? null)
+      if (event === 'SIGNED_OUT') {
+        setRecoveryMode(false)
+        passwordRecoveryBypassRef.current = false
+        window.localStorage.removeItem(REMEMBER_KEY)
+        window.sessionStorage.removeItem(SESSION_ONLY_KEY)
+      }
+    })
+
+    const runInitialSessionCheck = async () => {
+      // PASSWORD_RECOVERY 등 URL 처리가 끝난 뒤 세션을 읽도록 한 틱 미룸
+      await new Promise((r) => setTimeout(r, 0))
+      syncRecoveryFromUrl()
       const { data } = await supabase.auth.getSession()
       const sess = data.session
       if (sess) {
         const remember = window.localStorage.getItem(REMEMBER_KEY) === 'true'
         const sessionOnly = window.sessionStorage.getItem(SESSION_ONLY_KEY) === 'true'
-        if (!remember && !sessionOnly) {
+        if (!remember && !sessionOnly && !passwordRecoveryBypassRef.current) {
           await supabase.auth.signOut()
           setSession(null)
           return
         }
       }
       setSession(sess ?? null)
-    })()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, sess) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        setRecoveryMode(true)
-        setSession(sess ?? null)
-      } else {
-        setSession(sess ?? null)
-        if (event === 'SIGNED_OUT') {
-          setRecoveryMode(false)
-          window.localStorage.removeItem(REMEMBER_KEY)
-          window.sessionStorage.removeItem(SESSION_ONLY_KEY)
-        }
-      }
-    })
+    }
+    void runInitialSessionCheck()
 
     return () => subscription.unsubscribe()
   }, [])
@@ -88,8 +113,21 @@ function AuthGate() {
   if (!session || recoveryMode) {
     return (
       <LoginPage
+        key={recoveryMode ? 'password-recovery' : 'auth'}
         recoveryMode={recoveryMode}
         onPasswordReset={() => setRecoveryMode(false)}
+      />
+    )
+  }
+
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    return (
+      <AdminPage
+        session={session}
+        onBack={() => {
+          window.history.pushState({}, '', '/')
+          window.dispatchEvent(new PopStateEvent('popstate'))
+        }}
       />
     )
   }
@@ -169,13 +207,13 @@ function MainApp({ session }) {
                 title="메인으로"
                 aria-label="메인으로 이동"
               >
-                꽃사전
+                나의 꽃사전
               </h1>
             </div>
 
             <div className="header-center">
               <div className="header-search">
-                <Search className="header-search-icon" size={18} aria-hidden />
+                <Search className="header-search-icon" size={12} aria-hidden />
                 <input
                   type="search"
                   className="header-search-input"
@@ -189,32 +227,30 @@ function MainApp({ session }) {
             </div>
 
             <div className="header-right">
-              {filtered.length > 1 && (
-                <button
-                  type="button"
-                  className="header-random-btn"
-                  onClick={shuffleFlowers}
-                  title="랜덤 섞기"
-                  aria-label="랜덤 섞기"
-                >
-                  <Shuffle size={16} aria-hidden />
-                  <span>랜덤</span>
-                </button>
-              )}
+              <button
+                type="button"
+                className="header-random-btn"
+                onClick={shuffleFlowers}
+                disabled={flowers.length < 2}
+                title="랜덤 섞기"
+                aria-label="랜덤 섞기"
+              >
+                <Shuffle size={11} aria-hidden />
+              </button>
               <button
                 type="button"
                 className="header-lock-btn"
                 onClick={handleLock}
-                title="로그아웃"
-                aria-label="로그아웃"
+                title="로그인 화면 돌아가기"
+                aria-label="로그인 화면 돌아가기"
               >
-                <Lock size={16} aria-hidden />
+                <Lock size={11} aria-hidden />
               </button>
             </div>
           </div>
         </header>
 
-        <main className="main-content">
+        <main className="main-content main-content--fab">
           {loading ? (
             <div className="loading-state">
               <div className="spinner" />

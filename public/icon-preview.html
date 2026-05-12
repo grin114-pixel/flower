@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>홈 화면 아이콘 미리보기</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: 'Pretendard', 'Apple SD Gothic Neo', system-ui, sans-serif;
+        background: #ffffff;
+        display: grid;
+        place-items: center;
+        padding: 24px 16px 40px;
+        color: #4b4548;
+      }
+      h1 {
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin: 0 0 6px;
+        text-align: center;
+      }
+      p.sub {
+        margin: 0 0 28px;
+        font-size: 0.85rem;
+        color: #756e73;
+        text-align: center;
+        max-width: 320px;
+        line-height: 1.5;
+      }
+      .wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 32px;
+        justify-content: center;
+        align-items: flex-end;
+      }
+      .phone {
+        width: min(280px, 86vw);
+        aspect-ratio: 9 / 19.5;
+        border-radius: 36px;
+        background: #1a1a1e;
+        padding: 10px;
+        box-shadow:
+          0 24px 48px rgba(40, 30, 55, 0.22),
+          0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+      }
+      .screen {
+        width: 100%;
+        height: 100%;
+        border-radius: 28px;
+        overflow: hidden;
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      .status {
+        height: 28px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding-bottom: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        color: #4b4548;
+      }
+      .dock {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 20px;
+      }
+      .icon-tile {
+        width: 72px;
+        height: 72px;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow:
+          0 4px 14px rgba(180, 100, 130, 0.18),
+          0 0 0 1px rgba(255, 255, 255, 0.65) inset;
+      }
+      .icon-tile img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .app-name {
+        font-size: 12px;
+        font-weight: 500;
+        color: #4b4548;
+        text-align: center;
+        max-width: 100px;
+        line-height: 1.25;
+      }
+      .hint {
+        margin-top: 28px;
+        font-size: 0.78rem;
+        color: #9e8d94;
+        text-align: center;
+        max-width: 340px;
+        line-height: 1.55;
+      }
+      code {
+        font-size: 0.85em;
+        background: rgba(255, 142, 156, 0.12);
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <h1>홈 화면 바로가기 아이콘 미리보기</h1>
+      <p class="sub">아래는 생성된 <code>pwa-icon.png</code> (180px)를<br />휴대폰 그리드에 올린 것처럼 보여 준 샘플이에요.</p>
+      <div class="wrap">
+        <div class="phone" aria-hidden="true">
+          <div class="screen">
+            <div class="status">9:41</div>
+            <div class="dock">
+              <div class="icon-tile">
+                <img src="/pwa-icon.png" width="180" height="180" alt="" />
+              </div>
+              <span class="app-name">꽃사전</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="hint">
+        개발 서버 실행 후 이 파일을 열려면 주소창에
+        <code>http://localhost:5173/icon-preview.html</code> 를 입력하세요.<br />
+        실제 설치 아이콘은 <code>npm run icons</code> 로 만든 <code>public/pwa-192.png</code>,
+        <code>pwa-512.png</code>, <code>pwa-icon.png</code> 이 적용됩니다.
+      </p>
+    </div>
+  </body>
+</html>

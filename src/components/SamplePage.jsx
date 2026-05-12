@@ -3,12 +3,14 @@ import { Search, Shuffle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import FlowerCard from './FlowerCard'
 import ImageViewerModal from './ImageViewerModal'
-import headerFlowerIcon from '../assets/header-flower-hotpink.png'
+import headerFlowerIcon from '../assets/flower-header-line.png'
 import '../App.css'
 
 function FlowerLogo() {
   return (
-    <img className="app-logo-img" src={headerFlowerIcon} alt="꽃사전" width="22" height="22" />
+    <span className="app-logo-wrap">
+      <img className="app-logo-img" src={headerFlowerIcon} alt="" width="21" height="21" />
+    </span>
   )
 }
 
@@ -57,6 +59,12 @@ export default function SamplePage() {
     })
   }
 
+  const goToOwnDictionary = async () => {
+    await supabase.auth.signOut()
+    window.history.pushState(null, '', '/')
+    window.dispatchEvent(new PopStateEvent('popstate'))
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -74,13 +82,13 @@ export default function SamplePage() {
               title="메인으로"
               aria-label="메인으로 이동"
             >
-              꽃사전
+              나의 꽃사전
             </h1>
           </div>
 
           <div className="header-center">
             <div className="header-search">
-              <Search className="header-search-icon" size={18} aria-hidden />
+              <Search className="header-search-icon" size={12} aria-hidden />
               <input
                 type="search"
                 className="header-search-input"
@@ -102,15 +110,14 @@ export default function SamplePage() {
                 title="랜덤 섞기"
                 aria-label="랜덤 섞기"
               >
-                <Shuffle size={16} aria-hidden />
-                <span>랜덤</span>
+                <Shuffle size={11} aria-hidden />
               </button>
             )}
           </div>
         </div>
       </header>
 
-      <main className="main-content">
+      <main className="main-content main-content--sample-cta">
         {loading ? (
           <div className="loading-state">
             <div className="spinner" />
@@ -152,6 +159,16 @@ export default function SamplePage() {
           onClose={() => setViewer(null)}
         />
       ) : null}
+
+      <div className="sample-cta-floating">
+        <button
+          type="button"
+          className="sample-cta-btn"
+          onClick={goToOwnDictionary}
+        >
+          나만의 꽃사전 만들기
+        </button>
+      </div>
     </div>
   )
 }

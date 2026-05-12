@@ -1,7 +1,67 @@
-import { useState } from 'react'
+import { useState, useId } from 'react'
+import { Mail, Lock, UserPlus, Search } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import headerFlowerIcon from '../assets/header-flower-hotpink-transparent.png'
+import flowerIcon from '../assets/flower-icon-pink.png'
+import flowerFooterBlossom from '../assets/flower-footer-blossom.png'
 import './LoginPage.css'
+
+function LoginSubmitFlower() {
+  const uid = useId().replace(/:/g, '')
+  const gradId = `loginLeadFlowerGrad_${uid}`
+  const petals = [0, 72, 144, 216, 288]
+  return (
+    <svg
+      className="auth-btn-login-flower-svg"
+      viewBox="-4 -4 56 56"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+      focusable="false"
+    >
+      <defs>
+        <linearGradient id={gradId} gradientUnits="userSpaceOnUse" x1="24" y1="-4" x2="24" y2="52">
+          <stop offset="0%" stopColor="#FFADB5" />
+          <stop offset="100%" stopColor="#FF8E9C" />
+        </linearGradient>
+      </defs>
+      <g transform="translate(24, 24)">
+        {petals.map((deg) => (
+          <ellipse
+            key={deg}
+            cx="0"
+            cy="-14"
+            rx="8.5"
+            ry="11"
+            fill={`url(#${gradId})`}
+            stroke="#ffffff"
+            strokeWidth="1.85"
+            transform={`rotate(${deg})`}
+          />
+        ))}
+        {petals.map((deg) => (
+          <line
+            key={`l${deg}`}
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="-7.5"
+            stroke="#ffffff"
+            strokeWidth="1.15"
+            strokeLinecap="round"
+            transform={`rotate(${deg})`}
+          />
+        ))}
+        <circle
+          cx="0"
+          cy="0"
+          r="2.2"
+          fill={`url(#${gradId})`}
+          stroke="#ffffff"
+          strokeWidth="0.9"
+        />
+      </g>
+    </svg>
+  )
+}
 
 const PIN_SUFFIX = 'flower'
 const REMEMBER_KEY = 'flower.remember-device'
@@ -14,10 +74,60 @@ function onlyDigits(val) {
   return val.replace(/\D/g, '').slice(0, 4)
 }
 
+function EmailField({ value, onChange }) {
+  return (
+    <label className="auth-field">
+      <span>이메일</span>
+      <div className="auth-input-wrap">
+        <span className="auth-input-icon"><Mail size={15} strokeWidth={1.6} /></span>
+        <input
+          type="email"
+          autoComplete="email"
+          placeholder="example@email.com"
+          value={value}
+          onChange={onChange}
+        />
+      </div>
+    </label>
+  )
+}
+
+function PinField({ label, value, onChange, autoComplete }) {
+  return (
+    <label className="auth-field">
+      <span>{label}</span>
+      <div className="auth-input-wrap">
+        <span className="auth-input-icon"><Lock size={15} strokeWidth={1.6} /></span>
+        <input
+          type="password"
+          inputMode="numeric"
+          maxLength={4}
+          placeholder="0000"
+          value={value}
+          onChange={(e) => onChange(onlyDigits(e.target.value))}
+          autoComplete={autoComplete}
+        />
+      </div>
+    </label>
+  )
+}
+
+const Footer = () => (
+  <p className="auth-footer">
+    <span className="auth-footer-text">© 나의 꽃사전</span>
+    <img
+      src={flowerFooterBlossom}
+      className="auth-footer-flower"
+      alt=""
+      aria-hidden
+      draggable={false}
+    />
+  </p>
+)
+
 export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
   const [view, setView] = useState(recoveryMode ? 'reset' : 'login')
 
-  // Login
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPin, setLoginPin] = useState('')
   const [loginError, setLoginError] = useState('')
@@ -26,21 +136,17 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
     return typeof window !== 'undefined' && window.localStorage.getItem(REMEMBER_KEY) === 'true'
   })
 
-  // Signup
   const [signupEmail, setSignupEmail] = useState('')
   const [signupPin, setSignupPin] = useState('')
   const [signupPin2, setSignupPin2] = useState('')
   const [signupError, setSignupError] = useState('')
   const [signupLoading, setSignupLoading] = useState(false)
-  const [signupDone, setSignupDone] = useState(false)
 
-  // Forgot password
   const [forgotEmail, setForgotEmail] = useState('')
   const [forgotError, setForgotError] = useState('')
   const [forgotLoading, setForgotLoading] = useState(false)
   const [forgotDone, setForgotDone] = useState(false)
 
-  // Change password
   const [changeEmail, setChangeEmail] = useState('')
   const [changeCurrentPin, setChangeCurrentPin] = useState('')
   const [changeNewPin, setChangeNewPin] = useState('')
@@ -48,7 +154,6 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
   const [changeLoading, setChangeLoading] = useState(false)
   const [changeDone, setChangeDone] = useState(false)
 
-  // Reset password (via email link)
   const [resetPin, setResetPin] = useState('')
   const [resetPin2, setResetPin2] = useState('')
   const [resetError, setResetError] = useState('')
@@ -85,7 +190,7 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
     if (signupPin.length !== 4) { setSignupError('비밀번호 4자리를 입력해주세요.'); return }
     if (signupPin !== signupPin2) { setSignupError('비밀번호가 일치하지 않아요.'); return }
     setSignupLoading(true)
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: signupEmail.trim(),
       password: toAuthPassword(signupPin),
     })
@@ -96,9 +201,21 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
       } else {
         setSignupError('가입에 실패했어요. 다시 시도해주세요.')
       }
-    } else {
-      setSignupDone(true)
+      return
     }
+    // 이메일 인증을 끈 프로젝트면 signUp 직후 session 이 옵니다.
+    if (data?.session) {
+      return
+    }
+    // 일부 설정에서는 user 만 있고 session 없음 → 바로 로그인 시도
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: signupEmail.trim(),
+      password: toAuthPassword(signupPin),
+    })
+    if (!signInError) {
+      return
+    }
+    setSignupError('가입은 되었지만 로그인에 실패했어요. 잠시 후 다시 시도해주세요.')
   }
 
   async function handleForgot(e) {
@@ -124,7 +241,6 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
     if (changeCurrentPin.length !== 4) { setChangeError('현재 비밀번호 4자리를 입력해주세요.'); return }
     if (changeNewPin.length !== 4) { setChangeError('새 비밀번호 4자리를 입력해주세요.'); return }
     setChangeLoading(true)
-
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: changeEmail.trim(),
       password: toAuthPassword(changeCurrentPin),
@@ -134,12 +250,10 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
       setChangeError('이메일 또는 현재 비밀번호가 올바르지 않아요.')
       return
     }
-
     const { error: updateError } = await supabase.auth.updateUser({
       password: toAuthPassword(changeNewPin),
     })
     setChangeLoading(false)
-
     if (updateError) {
       setChangeError('비밀번호 변경에 실패했어요.')
     } else {
@@ -173,15 +287,23 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
     setSignupError('')
     setForgotError('')
     setChangeError('')
-    setSignupDone(false)
     setForgotDone(false)
     setChangeDone(false)
   }
 
   const brand = (
     <div className="auth-brand">
-      <img src={headerFlowerIcon} className="auth-logo" alt="나의 꽃사전" />
+      <img src={flowerIcon} className="auth-logo" alt="나의 꽃사전" />
       <span className="auth-brand-name">나의 꽃사전</span>
+      <p className="auth-tagline">나만의 꽃을 기록하는 공간</p>
+    </div>
+  )
+
+  const backToLogin = (
+    <div className="auth-bottom-links auth-bottom-links--center">
+      <button type="button" className="auth-link" onClick={goLogin}>
+        로그인으로 돌아가기
+      </button>
     </div>
   )
 
@@ -195,38 +317,23 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
             <div className="auth-done">
               <p>비밀번호를 변경했어요.</p>
               <p>새 비밀번호로 다시 로그인해주세요.</p>
-              <button className="auth-btn-primary" onClick={goLogin}>로그인으로 이동</button>
+              <button className="auth-btn-primary" onClick={goLogin}>
+                <img src={flowerIcon} className="auth-btn-icon" alt="" aria-hidden />
+                로그인으로 이동
+              </button>
             </div>
           ) : (
             <form className="auth-form" onSubmit={handleReset}>
-              <label className="auth-field">
-                <span>새 비밀번호 (숫자 4자리)</span>
-                <input
-                  type="password"
-                  inputMode="numeric"
-                  maxLength={4}
-                  placeholder="0000"
-                  value={resetPin}
-                  onChange={(e) => setResetPin(onlyDigits(e.target.value))}
-                />
-              </label>
-              <label className="auth-field">
-                <span>새 비밀번호 확인</span>
-                <input
-                  type="password"
-                  inputMode="numeric"
-                  maxLength={4}
-                  placeholder="0000"
-                  value={resetPin2}
-                  onChange={(e) => setResetPin2(onlyDigits(e.target.value))}
-                />
-              </label>
+              <PinField label="새 비밀번호 (숫자 4자리)" value={resetPin} onChange={setResetPin} />
+              <PinField label="새 비밀번호 확인" value={resetPin2} onChange={setResetPin2} />
               {resetError && <p className="auth-error">{resetError}</p>}
               <button type="submit" className="auth-btn-primary" disabled={resetLoading}>
+                <img src={flowerIcon} className="auth-btn-icon" alt="" aria-hidden />
                 {resetLoading ? '변경 중...' : '비밀번호 변경하기'}
               </button>
             </form>
           )}
+          <Footer />
         </div>
       </div>
     )
@@ -238,57 +345,18 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
         <div className="auth-card">
           {brand}
           <h2 className="auth-subtitle">회원 가입하기</h2>
-          {signupDone ? (
-            <div className="auth-done">
-              <p>가입 확인 이메일을 보냈어요.</p>
-              <p>이메일을 확인한 뒤 로그인해주세요.</p>
-              <button className="auth-btn-primary" onClick={goLogin}>로그인으로 이동</button>
-            </div>
-          ) : (
-            <form className="auth-form" onSubmit={handleSignup}>
-              <label className="auth-field">
-                <span>이메일</span>
-                <input
-                  type="email"
-                  autoComplete="email"
-                  placeholder="example@email.com"
-                  value={signupEmail}
-                  onChange={(e) => setSignupEmail(e.target.value)}
-                />
-              </label>
-              <label className="auth-field">
-                <span>비밀번호 (숫자 4자리)</span>
-                <input
-                  type="password"
-                  inputMode="numeric"
-                  maxLength={4}
-                  placeholder="0000"
-                  value={signupPin}
-                  onChange={(e) => setSignupPin(onlyDigits(e.target.value))}
-                />
-              </label>
-              <label className="auth-field">
-                <span>비밀번호 확인</span>
-                <input
-                  type="password"
-                  inputMode="numeric"
-                  maxLength={4}
-                  placeholder="0000"
-                  value={signupPin2}
-                  onChange={(e) => setSignupPin2(onlyDigits(e.target.value))}
-                />
-              </label>
-              {signupError && <p className="auth-error">{signupError}</p>}
-              <button type="submit" className="auth-btn-primary" disabled={signupLoading}>
-                {signupLoading ? '가입 중...' : '가입하기'}
-              </button>
-            </form>
-          )}
-          <div className="auth-bottom-links auth-bottom-links--center">
-            <button type="button" className="auth-link" onClick={goLogin}>
-              로그인으로 돌아가기
+          <form className="auth-form" onSubmit={handleSignup}>
+            <EmailField value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} />
+            <PinField label="비밀번호 (숫자 4자리)" value={signupPin} onChange={setSignupPin} />
+            <PinField label="비밀번호 확인" value={signupPin2} onChange={setSignupPin2} />
+            {signupError && <p className="auth-error">{signupError}</p>}
+            <button type="submit" className="auth-btn-primary" disabled={signupLoading}>
+              <img src={flowerIcon} className="auth-btn-icon" alt="" aria-hidden />
+              {signupLoading ? '가입 중...' : '가입하기'}
             </button>
-          </div>
+          </form>
+          {backToLogin}
+          <Footer />
         </div>
       </div>
     )
@@ -304,31 +372,23 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
             <div className="auth-done">
               <p>비밀번호 재설정 링크를 이메일로 보냈어요.</p>
               <p>이메일을 확인해주세요.</p>
-              <button className="auth-btn-primary" onClick={goLogin}>로그인으로 이동</button>
+              <button className="auth-btn-primary" onClick={goLogin}>
+                <img src={flowerIcon} className="auth-btn-icon" alt="" aria-hidden />
+                로그인으로 이동
+              </button>
             </div>
           ) : (
             <form className="auth-form" onSubmit={handleForgot}>
-              <label className="auth-field">
-                <span>이메일</span>
-                <input
-                  type="email"
-                  autoComplete="email"
-                  placeholder="example@email.com"
-                  value={forgotEmail}
-                  onChange={(e) => setForgotEmail(e.target.value)}
-                />
-              </label>
+              <EmailField value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} />
               {forgotError && <p className="auth-error">{forgotError}</p>}
               <button type="submit" className="auth-btn-primary" disabled={forgotLoading}>
+                <img src={flowerIcon} className="auth-btn-icon" alt="" aria-hidden />
                 {forgotLoading ? '전송 중...' : '재설정 링크 보내기'}
               </button>
             </form>
           )}
-          <div className="auth-bottom-links auth-bottom-links--center">
-            <button type="button" className="auth-link" onClick={goLogin}>
-              로그인으로 돌아가기
-            </button>
-          </div>
+          {backToLogin}
+          <Footer />
         </div>
       </div>
     )
@@ -344,53 +404,25 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
             <div className="auth-done">
               <p>비밀번호를 변경했어요.</p>
               <p>새 비밀번호로 다시 로그인해주세요.</p>
-              <button className="auth-btn-primary" onClick={goLogin}>로그인으로 이동</button>
+              <button className="auth-btn-primary" onClick={goLogin}>
+                <img src={flowerIcon} className="auth-btn-icon" alt="" aria-hidden />
+                로그인으로 이동
+              </button>
             </div>
           ) : (
             <form className="auth-form" onSubmit={handleChange}>
-              <label className="auth-field">
-                <span>이메일</span>
-                <input
-                  type="email"
-                  autoComplete="email"
-                  placeholder="example@email.com"
-                  value={changeEmail}
-                  onChange={(e) => setChangeEmail(e.target.value)}
-                />
-              </label>
-              <label className="auth-field">
-                <span>현재 비밀번호</span>
-                <input
-                  type="password"
-                  inputMode="numeric"
-                  maxLength={4}
-                  placeholder="0000"
-                  value={changeCurrentPin}
-                  onChange={(e) => setChangeCurrentPin(onlyDigits(e.target.value))}
-                />
-              </label>
-              <label className="auth-field">
-                <span>새 비밀번호</span>
-                <input
-                  type="password"
-                  inputMode="numeric"
-                  maxLength={4}
-                  placeholder="0000"
-                  value={changeNewPin}
-                  onChange={(e) => setChangeNewPin(onlyDigits(e.target.value))}
-                />
-              </label>
+              <EmailField value={changeEmail} onChange={(e) => setChangeEmail(e.target.value)} />
+              <PinField label="현재 비밀번호" value={changeCurrentPin} onChange={setChangeCurrentPin} />
+              <PinField label="새 비밀번호" value={changeNewPin} onChange={setChangeNewPin} />
               {changeError && <p className="auth-error">{changeError}</p>}
               <button type="submit" className="auth-btn-primary" disabled={changeLoading}>
+                <img src={flowerIcon} className="auth-btn-icon" alt="" aria-hidden />
                 {changeLoading ? '변경 중...' : '비밀번호 변경하기'}
               </button>
             </form>
           )}
-          <div className="auth-bottom-links auth-bottom-links--center">
-            <button type="button" className="auth-link" onClick={goLogin}>
-              로그인으로 돌아가기
-            </button>
-          </div>
+          {backToLogin}
+          <Footer />
         </div>
       </div>
     )
@@ -401,64 +433,59 @@ export default function LoginPage({ recoveryMode = false, onPasswordReset }) {
       <div className="auth-card">
         {brand}
         <form className="auth-form" onSubmit={handleLogin}>
-          <label className="auth-field">
-            <span>이메일</span>
-            <input
-              type="email"
-              autoComplete="email"
-              placeholder="example@email.com"
-              value={loginEmail}
-              onChange={(e) => setLoginEmail(e.target.value)}
-            />
-          </label>
-          <label className="auth-field">
-            <span>비밀번호 (숫자 4자리)</span>
-            <input
-              type="password"
-              inputMode="numeric"
-              maxLength={4}
-              placeholder="0000"
+          <div className="auth-form-email-pin">
+            <EmailField value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
+            <PinField
+              label="비밀번호 (숫자 4자리)"
               value={loginPin}
-              onChange={(e) => setLoginPin(onlyDigits(e.target.value))}
+              onChange={setLoginPin}
               autoComplete="current-password"
             />
-          </label>
+          </div>
           <label className="auth-remember">
             <input
               type="checkbox"
               checked={rememberDevice}
               onChange={(e) => setRememberDevice(e.target.checked)}
             />
-            <span>이 기기 기억하기</span>
+            <span className="auth-checkbox-custom" />
+            <span className="auth-remember-label">이 기기 기억하기</span>
           </label>
           {loginError && <p className="auth-error">{loginError}</p>}
           <button type="submit" className="auth-btn-primary" disabled={loginLoading}>
+            <LoginSubmitFlower />
             {loginLoading ? '로그인 중...' : '로그인'}
           </button>
         </form>
-        <div className="auth-bottom-links">
+        <div className="auth-bottom-links auth-bottom-links--spread">
           <button
             type="button"
-            className="auth-link"
-            onClick={() => { setView('signup'); setSignupError(''); setSignupDone(false) }}
+            className="auth-link auth-link--signup-cta"
+            onClick={() => { setView('signup'); setSignupError('') }}
           >
+            <UserPlus size={13} strokeWidth={1.6} />
             회원 가입하기
           </button>
+          <span className="auth-link-sep" aria-hidden />
           <button
             type="button"
             className="auth-link"
             onClick={() => { setView('forgot'); setForgotError(''); setForgotDone(false) }}
           >
+            <Search size={13} strokeWidth={1.6} />
             비밀번호 찾기
           </button>
+          <span className="auth-link-sep" aria-hidden />
           <button
             type="button"
             className="auth-link"
             onClick={() => { setView('change'); setChangeError(''); setChangeDone(false) }}
           >
+            <Lock size={13} strokeWidth={1.6} />
             비밀번호 변경하기
           </button>
         </div>
+        <Footer />
       </div>
     </div>
   )

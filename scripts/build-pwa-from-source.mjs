@@ -5,12 +5,11 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(__dirname, '..')
 
-// 헤더 아이콘(꽃그림)을 홈화면 아이콘으로 사용
-// (원본 header-flower.png에는 테두리가 있어, 리컬러된 버전을 사용)
-const sourcePath = path.join(root, 'src', 'assets', 'header-flower-hotpink.png')
+// 홈화면·바로가기 아이콘 (첨부 꽃 일러스트)
+const sourcePath = path.join(root, 'src', 'assets', 'pwa-icon-source.png')
 const outDir = path.join(root, 'public')
 
-const BG = '#FFB7C5' // 메인색
+const BG = '#ffffff'
 
 async function buildOne(size, filename) {
   const canvas = sharp({
